@@ -41,8 +41,8 @@
     "openseadragon": "5.0.1"
   },
   "optionalDependencies": {
-    "canvas": "^2.11.2",
-    "jsdom": "^25.0.1"
+    "canvas": "^3.2.3",
+    "jsdom": "^27.0.1"
   },
   "devDependencies": {
     "@types/bootstrap": "^5.2.10",

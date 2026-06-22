@@ -245,5 +245,56 @@ document.addEventListener('DOMContentLoaded', async () => {
       window.location.reload();
     }
   });
+
+  // --- noita-live-map integration: live player marker ---
+  const playerMarker = document.createElement('div');
+  playerMarker.id = 'noita-live-map-player-marker';
+  playerMarker.style.cssText = `
+    width: 14px;
+    height: 14px;
+    background: #ff3333;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+  `;
+
+  let playerMarkerPosition = { x: 0, y: 0 };
+
+  const setPlayerPosition = (x: number, y: number) => {
+    playerMarkerPosition = { x, y };
+    const point = new OpenSeadragon.Point(x, y);
+
+    if (!document.getElementById('noita-live-map-player-marker')) {
+      app.osd.addOverlay(playerMarker, point, OpenSeadragon.Placement.CENTER);
+    } else {
+      app.osd.updateOverlay(playerMarker, point, OpenSeadragon.Placement.CENTER);
+    }
+  };
+
+  const panToPlayer = () => {
+    app.osd.panToTarget(playerMarkerPosition.x, playerMarkerPosition.y);
+  };
+
+  window.addEventListener('message', (event: MessageEvent) => {
+    const data = event.data;
+    if (!data || typeof data !== 'object') return;
+
+    if (data.type === 'noita-live-map:telemetry') {
+      setPlayerPosition(data.x, data.y);
+    }
+
+    if (data.type === 'noita-live-map:pan-to-player') {
+      panToPlayer();
+    }
+  });
+
+  (window as any).noitamapApi = {
+    setPlayerPosition,
+    panToPlayer,
+  };
+  // --- end noita-live-map integration ---
+
   initKonamiCode();
 });
